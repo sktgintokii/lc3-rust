@@ -1,10 +1,6 @@
 const PC_START: u16 = 0x3000;
 
-// Conditional flag
-pub const FLG_POS: u16 = 1 << 0; // Z
-pub const FLG_ZRO: u16 = 1 << 1; // P
-pub const FLG_NEG: u16 = 1 << 2; // N
-
+#[derive(Debug)]
 pub struct Register {
     pub r0: u16,
     pub r1: u16,
@@ -63,18 +59,6 @@ impl Register {
             8 => self.pc = value,
             9 => self.cond = value,
             _ => panic!("Index out of bound"),
-        }
-    }
-
-    pub fn update_r_cond(&mut self, index: u16) {
-        let val = self.get(index);
-
-        if val == 0 {
-            self.cond = FLG_ZRO
-        } else if val >> 15 == 1 {
-            self.cond = FLG_NEG
-        } else {
-            self.cond = FLG_POS
         }
     }
 }

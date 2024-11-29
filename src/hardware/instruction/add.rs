@@ -1,4 +1,4 @@
-use super::Vm;
+use super::{safe_u16_add, Vm};
 
 /// ADD takes two values and stores them in a register.
 /// In register mode, the second value to add is found in a register.
@@ -25,25 +25,23 @@ pub fn add(instr: u16, vm: &mut Vm) {
     let sr1 = (instr >> 6) & 0x7;
     let imm_flag = (instr >> 5) & 0x1;
 
-    println!("debug");
-
     if imm_flag == 1 {
         let imm5 = super::sign_extend(instr & 0x1F, 5);
-        let sum = (vm.register.get(sr1) as u32 + imm5 as u32) as u16; // cast to u32 to prevent overflow
+        let sum = safe_u16_add(vm.register.get(sr1), imm5);
         vm.register.update(dr, sum);
+        vm.register.cond = super::get_cond_flag(sum);
     } else {
         let sr2 = instr & 0x7;
-        let sum = (vm.register.get(sr1) as u32 + vm.register.get(sr2) as u32) as u16; // cast to u32 to prevent overflow
+        let sum = safe_u16_add(vm.register.get(sr1), vm.register.get(sr2));
 
         vm.register.update(dr, sum);
+        vm.register.cond = super::get_cond_flag(sum);
     }
-
-    vm.register.update_r_cond(dr);
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::hardware::register::{FLG_NEG, FLG_POS, FLG_ZRO};
+    use crate::hardware::instruction::ConditionFlag;
 
     use super::*;
 
@@ -51,51 +49,40 @@ mod tests {
     fn test_register_mode() {
         let mut vm = Vm::new();
 
-        let v1: u16 = 4917;
-        let v2: u16 = 98;
+        vm.register.update(1, 4917); // write 4917 to r1
+        vm.register.update(2, 98); // write 98 to r2
 
-        // set register
-        vm.register.update(1, v1);
-        vm.register.update(2, v2);
-
-        // execute instruction
+        // load r1=4917 and r2=98, then add the values=>5015, then write to r0
         add(0b_0001_000_001_0_00_010, &mut vm);
 
-        assert_eq!(vm.register.r0, v1 + v2);
-        assert_eq!(vm.register.cond, FLG_ZRO);
+        assert_eq!(vm.register.r0, 5015);
+        assert_eq!(vm.register.cond, ConditionFlag::POS as u16);
     }
 
     #[test]
     fn test_register_mode_with_negative_num() {
         let mut vm = Vm::new();
 
-        let v1: u16 = 105;
-        let v2: u16 = 64549; // 65536 - 987 = 64549
+        vm.register.update(1, 105); // write 105 to r1
+        vm.register.update(2, 64549); // write -987 (since 65536 - 987 = 64549) to r1
 
-        // set register
-        vm.register.update(1, v1);
-        vm.register.update(2, v2);
-
-        // execute instruction
+        // load r1=105 and r2=-987, then add the values=>-882 (=64654), then write to r0
         add(0b_0001_000_001_0_00_010, &mut vm);
 
-        assert_eq!(vm.register.r0, v1 + v2);
-        assert_eq!(vm.register.cond, FLG_NEG);
+        assert_eq!(vm.register.r0, 64654);
+        assert_eq!(vm.register.cond, ConditionFlag::NEG as u16);
     }
 
     #[test]
     fn test_immediate_mode() {
         let mut vm = Vm::new();
 
-        let v1: u16 = 105;
+        vm.register.update(1, 105); // write 105 to r1
 
-        // set register
-        vm.register.update(1, v1);
-
-        // execute instruction
+        // load r1=105, then add sr2=7, then write result=112 to r0
         add(0b_0001_000_001_1_00111, &mut vm);
 
-        assert_eq!(vm.register.r0, v1 + 7);
-        assert_eq!(vm.register.cond, FLG_POS);
+        assert_eq!(vm.register.r0, 112);
+        assert_eq!(vm.register.cond, ConditionFlag::POS as u16);
     }
 }

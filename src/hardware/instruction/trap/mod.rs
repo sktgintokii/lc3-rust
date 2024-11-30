@@ -1,6 +1,6 @@
 use std::process;
 
-use crate::hardware::Vm;
+use super::super::Vm;
 
 use getc::getc;
 use halt::halt;

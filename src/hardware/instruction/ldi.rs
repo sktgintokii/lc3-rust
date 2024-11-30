@@ -1,6 +1,4 @@
-use crate::hardware::Vm;
-
-use super::{get_cond_flag, sign_extend};
+use super::{get_cond_flag, sign_extend, Vm};
 
 /// Load indirect
 /// An address is computed by sign-extending bits [8:0] to 16 bits and adding this

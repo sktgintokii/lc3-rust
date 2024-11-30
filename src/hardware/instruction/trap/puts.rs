@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::hardware::Vm;
+use super::super::Vm;
 
 pub fn puts(vm: &mut Vm) {
     let mut addr = vm.register.r0;

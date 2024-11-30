@@ -1,6 +1,4 @@
-use crate::hardware::Vm;
-
-use super::{get_cond_flag, safe_u16_add, sign_extend};
+use super::{get_cond_flag, safe_u16_add, sign_extend, Vm};
 
 /// Load base + offset
 /// An address is computed by sign-extending bits [5:0] to 16 bits

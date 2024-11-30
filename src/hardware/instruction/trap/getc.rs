@@ -1,6 +1,6 @@
 use std::io::Read;
 
-use crate::hardware::Vm;
+use super::super::Vm;
 
 pub fn getc(vm: &mut Vm) {
     let mut buf = [0; 1];

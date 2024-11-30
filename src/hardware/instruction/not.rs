@@ -1,6 +1,4 @@
-use crate::hardware::Vm;
-
-use super::get_cond_flag;
+use super::{get_cond_flag, Vm};
 
 /// Simple binary negation.
 /// 15           12 │11        9│8         6│ 5 │4                 0

@@ -1,6 +1,4 @@
-use crate::hardware::Vm;
-
-use super::{safe_u16_add, sign_extend};
+use super::{safe_u16_add, sign_extend, Vm};
 
 /// The contents of the register specified by SR are stored in the memory location
 /// whose address is computed by sign-extending bits [8:0] to 16 bits and adding

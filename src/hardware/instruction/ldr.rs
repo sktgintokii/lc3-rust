@@ -14,11 +14,11 @@ use super::{get_cond_flag, safe_u16_add, sign_extend};
 /// └───────────────┴───────────┴───────────────┴───────────────────┘
 ///
 pub fn ldr(instr: u16, vm: &mut Vm) {
-    let offset6 = instr & 0x3f;
+    let offset6 = sign_extend(instr & 0x3f, 6);
     let sr = (instr >> 6) & 0x7;
     let dr = (instr >> 9) & 0x7;
 
-    let addr = safe_u16_add(vm.register.get(sr), sign_extend(offset6, 6));
+    let addr = safe_u16_add(vm.register.get(sr), offset6);
     let value = vm.memory.read(addr);
     vm.register.update(dr, value);
     vm.register.cond = get_cond_flag(value);

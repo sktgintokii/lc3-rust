@@ -11,13 +11,11 @@ use super::{safe_u16_add, sign_extend};
 /// │      1011     │     SR    │            PCOffset9              │
 /// └───────────────┴───────────┴───────────────────────────────────┘
 pub fn sti(instr: u16, vm: &mut Vm) {
-    let pc_offset9 = instr & 0x1ff;
+    let pc_offset9 = sign_extend(instr & 0x1ff, 9);
     let sr = (instr >> 9) & 0x7;
 
     let value = vm.register.get(sr);
-    let addr = vm
-        .memory
-        .read(safe_u16_add(vm.register.pc, sign_extend(pc_offset9, 9)));
+    let addr = vm.memory.read(safe_u16_add(vm.register.pc, pc_offset9));
 
     vm.memory.write(addr, value);
 }

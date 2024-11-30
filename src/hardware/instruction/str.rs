@@ -12,12 +12,12 @@ use super::{safe_u16_add, sign_extend};
 /// └───────────────┴───────────┴───────────┴───────────────────────┘
 ///
 pub fn str(instr: u16, vm: &mut Vm) {
-    let offset6 = instr & 0x3f;
+    let offset6 = sign_extend(instr & 0x3f, 6);
     let sr_base = (instr >> 6) & 0x7;
     let sr = (instr >> 9) & 0x7;
 
     let value = vm.register.get(sr);
-    let addr = safe_u16_add(vm.register.get(sr_base), sign_extend(offset6, 6));
+    let addr = safe_u16_add(vm.register.get(sr_base), offset6);
     vm.memory.write(addr, value);
 }
 

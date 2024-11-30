@@ -22,8 +22,8 @@ pub fn jsr(instr: u16, vm: &mut Vm) {
     vm.register.r7 = vm.register.pc;
     if long_flag == 1 {
         // JSR
-        let pc_offset11 = instr & 0x7ff;
-        vm.register.pc = safe_u16_add(vm.register.pc, sign_extend(pc_offset11, 11));
+        let pc_offset11 = sign_extend(instr & 0x7ff, 11);
+        vm.register.pc = safe_u16_add(vm.register.pc, pc_offset11);
     } else {
         // JSRR
         let sr1 = (instr >> 6) & 0x7;

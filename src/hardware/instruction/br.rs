@@ -15,10 +15,10 @@ use super::{safe_u16_add, sign_extend, Vm};
 ///
 pub fn br(instr: u16, vm: &mut Vm) {
     let cond_flag = (instr >> 9) & 0x7;
-    let pc_offset9 = instr & 0x1ff;
+    let pc_offset9 = sign_extend(instr & 0x1ff, 9);
 
     if (vm.register.cond & cond_flag) != 0 {
-        vm.register.pc = safe_u16_add(vm.register.pc, sign_extend(pc_offset9, 9));
+        vm.register.pc = safe_u16_add(vm.register.pc, pc_offset9);
     }
 }
 

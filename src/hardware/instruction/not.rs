@@ -1,5 +1,7 @@
 use crate::hardware::Vm;
 
+use super::get_cond_flag;
+
 /// Simple binary negation.
 /// 15           12 │11        9│8         6│ 5 │4                 0
 /// ┌───────────────┼───────────┼───────────┼───┼───────────────────┐
@@ -13,7 +15,7 @@ pub fn not(instr: u16, vm: &mut Vm) {
     let value = !vm.register.get(sr);
     vm.register.update(dr, value);
 
-    let cond_flag = super::get_cond_flag(value);
+    let cond_flag = get_cond_flag(value);
     vm.register.cond = cond_flag;
 }
 

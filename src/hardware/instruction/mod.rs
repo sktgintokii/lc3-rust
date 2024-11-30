@@ -8,9 +8,12 @@ use jsr::jsr;
 use ld::ld;
 use ldi::ldi;
 use ldr::ldr;
+use lea::lea;
 use not::not;
 use st::st;
+use sti::sti;
 use str::str;
+use trap::trap;
 
 mod add;
 mod and;
@@ -20,9 +23,12 @@ mod jsr;
 mod ld;
 mod ldi;
 mod ldr;
+mod lea;
 mod not;
 mod st;
+mod sti;
 mod str;
+mod trap;
 
 pub enum ConditionFlag {
     POS = 1 << 0,
@@ -96,23 +102,30 @@ pub fn execute_instruction(instr: u16, vm: &mut Vm) {
         Some(OpCode::RTI) => panic!(),
         Some(OpCode::NOT) => not(instr, vm),
         Some(OpCode::LDI) => ldi(instr, vm),
-        // Some(OpCode::STI) => (),
+        Some(OpCode::STI) => sti(instr, vm),
         Some(OpCode::JMP) => jmp(instr, vm),
         Some(OpCode::RES) => panic!(),
-        // Some(OpCode::LEA) => (),
-        // Some(OpCode::TRAP) => (),
-        _ => panic!(),
+        Some(OpCode::LEA) => lea(instr, vm),
+        Some(OpCode::TRAP) => trap(instr, vm),
+        _ => {}
     }
 }
 
 pub fn sign_extend(x: u16, bit_count: u8) -> u16 {
     let first_bit = (x >> (bit_count - 1)) & 1;
     if first_bit == 1 {
-        return x & (0xFFFF << bit_count);
+        return x | (0xFFFF << bit_count);
     }
     x
 }
 
 pub fn safe_u16_add(x: u16, y: u16) -> u16 {
     (x as u32 + y as u32) as u16
+}
+
+pub fn get_2bytes_chars(x: u16) -> [char; 2] {
+    let c1 = (x & 0xff) as u8 as char;
+    let c2 = (x >> 8) as u8 as char;
+
+    [c1, c2] // big endian
 }

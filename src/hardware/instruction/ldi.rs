@@ -19,7 +19,8 @@ pub fn ldi(instr: u16, vm: &mut Vm) {
     let dr = (instr >> 9) & 0x7;
     let pc_offset9 = instr & 0x1ff;
 
-    let addr = vm.register.pc + sign_extend(pc_offset9, 9);
+    let first_read_addr = vm.register.pc + sign_extend(pc_offset9, 9);
+    let addr = vm.memory.read(first_read_addr);
     let value = vm.memory.read(addr);
 
     vm.register.update(dr, value);
@@ -38,11 +39,12 @@ mod test {
 
         vm.register.pc = 1095;
         vm.memory.write(1095 + 33, 458);
+        vm.memory.write(458, 101);
 
         // load memory at addr = pc+33, then save to r3
         ldi(0b1010_011_000100001, &mut vm);
 
-        assert_eq!(vm.register.r3, 458);
+        assert_eq!(vm.register.r3, 101);
         assert_eq!(vm.register.cond, ConditionFlag::POS as u16);
     }
 }

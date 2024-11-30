@@ -77,12 +77,12 @@ mod tests {
     fn test_immediate_mode() {
         let mut vm = Vm::new();
 
-        vm.register.update(1, 105); // write 105 to r1
+        vm.register.r6 = 16384;
 
-        // load r1=105, then add sr2=7, then write result=112 to r0
-        add(0b_0001_000_001_1_00111, &mut vm);
+        // load r6=16384, then add sr2=29 (=-3), then write result=16381 to r6
+        add(0b_0001_110_110_1_11101, &mut vm);
 
-        assert_eq!(vm.register.r0, 112);
+        assert_eq!(vm.register.r6, 16381);
         assert_eq!(vm.register.cond, ConditionFlag::POS as u16);
     }
 }
